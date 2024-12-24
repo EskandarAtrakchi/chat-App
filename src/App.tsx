@@ -214,12 +214,17 @@ export default function App() {
           placeholder="Enter your message..."
           className="message-input"
         />
+        <label htmlFor="file-input" className="file-input-label">
+          Choose File
+        </label>
         <input
           type="file"
+          id="file-input"
           accept="image/*,video/*"
           onChange={(e) => setFile(e.target.files?.[0] || null)}
           className="file-input"
         />
+
         <button type="submit" className="send-button">
           Send
         </button>
