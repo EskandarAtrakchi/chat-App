@@ -4,40 +4,35 @@ import "./App.css";
 interface Message {
   id: number;
   text: string;
-  sender: string; // Dynamic sender for user names
+  sender: "user" | "system";
 }
 
 export default function App() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const socketRef = useRef<WebSocket | null>(null);
-  const userName = `User-${Math.floor(Math.random() * 1000)}`; // Random user name
 
-  useEffect(() => {
-    // Connect to WebSocket server
-    socketRef.current = new WebSocket("ws://your-websocket-server-url");
-    
-    // Handle incoming messages
-    socketRef.current.onmessage = (event) => {
-      const message = JSON.parse(event.data) as Message;
-      setMessages((prevMessages) => [...prevMessages, message]);
-    };
-
-    // Cleanup on unmount
-    return () => {
-      socketRef.current?.close();
-    };
-  }, []);
+  const addMessage = (text: string, sender: "user" | "system") => {
+    setMessages((prevMessages) => [
+      ...prevMessages,
+      { id: Date.now(), text, sender },
+    ]);
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (input.trim() && socketRef.current) {
-      const message = { id: Date.now(), text: input, sender: userName };
-      socketRef.current.send(JSON.stringify(message)); // Send message to server
+    if (input.trim()) {
+      addMessage(input, "user");
       setInput("");
+      setTimeout(() => {
+        addMessage("Access denied. Try again.", "system");
+      }, 1000);
     }
   };
+
+  useEffect(() => {
+    addMessage("Welcome to the secure chat. Proceed with caution.", "system");
+  }, []);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -50,8 +45,10 @@ export default function App() {
       </header>
       <div className="chat-container">
         {messages.map((message) => (
-          <div key={message.id} className={`message ${message.sender === userName ? "user" : "system"}`}>
-            <span className="prefix">{message.sender === userName ? ">" : `${message.sender}:`}</span>{" "}
+          <div key={message.id} className={`message ${message.sender}`}>
+            <span className="prefix">
+              {message.sender === "user" ? ">" : "#"}
+            </span>{" "}
             {message.text}
           </div>
         ))}
