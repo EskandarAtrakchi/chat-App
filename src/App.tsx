@@ -181,7 +181,8 @@ export default function App() {
   return (
     <div className="app">
       <header className="app-header">
-        <h1>// Secure Chat Terminal</h1>
+        <h1>// Symmetric Encryption (AES-256)</h1>
+        <h1>// Hashing (SHA-256)</h1>
       </header>
       <div className="chat-container">
         {messages.map((message) => (
